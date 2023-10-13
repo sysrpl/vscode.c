@@ -19,6 +19,21 @@ static void on_entry_activate(GtkEntry *entry, gpointer user_data)
     }
 }
 
+static gboolean on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+{
+    if ((event->state & GDK_CONTROL_MASK) && (event->keyval == GDK_KEY_l)) {
+        GtkWidget *widget = GTK_WIDGET(user_data);
+        gtk_widget_grab_focus(widget);
+        return TRUE;
+    }
+    if ((event->state & GDK_CONTROL_MASK) && (event->keyval == GDK_KEY_F5)) {
+        WebKitWebView *web_view = WEBKIT_WEB_VIEW(widget);
+        webkit_web_view_reload_bypass_cache(web_view);
+        return TRUE;
+    }
+    return FALSE;
+}
+
 static void on_back_button_clicked(GtkButton *button, gpointer user_data)
 {
     WebKitWebView *web_view = WEBKIT_WEB_VIEW(user_data);
@@ -123,6 +138,7 @@ int main(int argc, char *argv[])
 
     gpointer user_data[] = {url_entry, back_button, forward_button};
     g_signal_connect(web_view, "load-changed", G_CALLBACK(on_web_view_load_changed), user_data);
+    g_signal_connect(web_view, "key-press-event", G_CALLBACK(on_key_press), url_entry);
 
     webkit_web_view_load_uri(web_view, "https://www.reddit.com");
 
